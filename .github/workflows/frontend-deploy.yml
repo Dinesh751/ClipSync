@@ -29,4 +29,4 @@ jobs:
       - name: Run frontend ESLint
         run: |
           cd frontend
-          npm run lint -- --watchAll=false
+          npm run lint
