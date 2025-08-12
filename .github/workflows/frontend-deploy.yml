@@ -14,19 +14,36 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
       - name: Install dependencies
         run: |
           cd frontend
-          npm install
-      - name: Run frontend tests
+          npm ci
+      
+      - name: Run ESLint check
         run: |
           cd frontend
-          npm test -- --watchAll=false
-      - name: Run frontend ESLint
+          npm run lint:check
+        env:
+          CI: true
+
+      - name: Build application
         run: |
           cd frontend
-          npm run lint
+          npm run build
+        env:
+          CI: true
+      
+      - name: Run tests
+        run: |
+          cd frontend
+          npm test -- --coverage --ci --watchAll=false
+        env:
+          CI: true

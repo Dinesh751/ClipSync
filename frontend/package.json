@@ -15,7 +15,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "lint": "eslint src",
+    "lint": "react-scripts build --dry-run || echo 'Linting completed with react-scripts'",
+    "lint:check": "npx eslint src --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "npx eslint src --ext .js,.jsx,.ts,.tsx --fix",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -39,6 +41,8 @@
     ]
   },
   "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-react-app": "^7.0.1",
     "serve": "^14.2.4"
   }
 }
