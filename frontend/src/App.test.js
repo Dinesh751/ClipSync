@@ -1,5 +1,4 @@
 import React from 'react';
-import { render } from '@testing-library/react';
 
 // Simple test case to verify GitHub Actions workflow
 describe('App Component', () => {
