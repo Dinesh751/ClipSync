@@ -1,0 +1,3 @@
+/* Import base styles and component styles */
+@import './styles/base.css';
+@import './styles/components/index.css';
