@@ -47,7 +47,7 @@ const SignupForm = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
@@ -63,7 +63,7 @@ const SignupForm = () => {
     if (result.success) {
       setSuccessMessage('Account created successfully! Redirecting...');
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/');
       }, 2000);
     }
   };

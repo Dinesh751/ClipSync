@@ -40,7 +40,7 @@ const LoginForm = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
@@ -54,7 +54,7 @@ const LoginForm = () => {
   const onSubmit = async (formData) => {
     const result = await login(formData.email, formData.password);
     if (result.success) {
-      navigate('/dashboard');
+      navigate('/');
     }
   };
 
