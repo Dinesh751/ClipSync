@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
-import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import './App.css';
 
@@ -19,19 +19,19 @@ function App() {
             
             {/* Protected Routes */}
             <Route 
-              path="/dashboard" 
+              path="/" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <Home />
                 </ProtectedRoute>
               } 
             />
             
             {/* Default redirect */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Navigate to="/" replace />} />
             
             {/* Catch all route */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </Router>
