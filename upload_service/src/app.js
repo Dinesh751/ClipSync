@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 // Create Express app
 const app = express();
@@ -46,18 +47,8 @@ app.get('/', (req, res) => {
   });
 });
 
-// Upload endpoint placeholder
-app.post('/api/upload', (req, res) => {
-  console.log('Upload request received');
-  res.json({
-    success: true,
-    message: 'Upload service is ready',
-    data: {
-      uploadId: 'temp_' + Date.now(),
-      status: 'pending'
-    }
-  });
-});
+// Routes
+app.use('/api/upload', uploadRoutes);
 
 // 404 handler for undefined routes
 app.use('*', (req, res) => {
