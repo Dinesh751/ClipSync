@@ -1,29 +1,19 @@
 
 
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '../components/Navbar';
 import VideoLibrary from './VideoLibrary';
-import '../styles/pages/Home.css';
 
 const Home = () => {
-  const [triggerUpload, setTriggerUpload] = useState(0);
-
-  const handleNavbarUpload = () => {
-    // Trigger upload modal by incrementing the trigger value
-    setTriggerUpload(prev => prev + 1);
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Navbar */}
-      <Navbar onUploadClick={handleNavbarUpload} />
+      <Navbar />
 
       {/* Main Content */}
-      <main className="home-content">
-        <div className="px-4">
-          <div className="home-main-content">
-            <VideoLibrary triggerUpload={triggerUpload} />
-          </div>
+      <main className="pt-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <VideoLibrary />
         </div>
       </main>
     </div>
