@@ -14,27 +14,39 @@ const Button = ({
   ...props
 }) => {
   const getButtonClasses = () => {
-    let classes = 'btn';
+    let classes = '';
     
     // Variant styles
-    if (variant === 'primary') {
-      classes += ' btn-primary';
-    } else if (variant === 'outline') {
-      classes += ' btn-outline';
-    } else if (variant === 'secondary') {
-      classes += ' btn-outline';
-    } else if (variant === 'ghost') {
-      classes += ' btn-outline';
+    switch (variant) {
+      case 'primary':
+        classes += 'btn-primary';
+        break;
+      case 'secondary':
+        classes += 'btn-secondary';
+        break;
+      case 'outline':
+        classes += 'btn-secondary';
+        break;
+      case 'ghost':
+        classes += 'btn-ghost';
+        break;
+      case 'danger':
+        classes += 'btn-danger';
+        break;
+      default:
+        classes += 'btn-primary';
     }
     
-    // Size styles
+    // Size variations
     if (size === 'sm') {
-      classes += ' btn-sm';
+      classes += ' py-2 px-4 text-sm';
+    } else if (size === 'lg') {
+      classes += ' py-4 px-8 text-lg';
     }
     
-    // Full width
-    if (className.includes('w-full')) {
-      classes += ' btn-w-full';
+    // Disabled state
+    if (disabled || loading) {
+      classes += ' opacity-50 cursor-not-allowed';
     }
     
     return classes + ' ' + className;
@@ -49,20 +61,20 @@ const Button = ({
       {...props}
     >
       {loading ? (
-        <>
-          <div className="spinner" style={{marginRight: '0.5rem', width: '1rem', height: '1rem'}}></div>
-          Loading...
-        </>
+        <div className="flex items-center justify-center">
+          <div className="spinner mr-2"></div>
+          {typeof children === 'string' ? children.replace(/^(Sign in|Create account|Upload)/, '$1ing').replace(/Sign ining/, 'Signing in') : 'Loading...'}
+        </div>
       ) : (
-        <>
+        <div className="flex items-center justify-center">
           {Icon && iconPosition === 'left' && (
-            <Icon className={children ? 'mr-2' : ''} style={{width: '1.25rem', height: '1.25rem'}} />
+            <Icon className={children ? 'mr-2 w-4 h-4' : 'w-4 h-4'} />
           )}
           {children}
           {Icon && iconPosition === 'right' && (
-            <Icon className={children ? 'ml-2' : ''} style={{width: '1.25rem', height: '1.25rem'}} />
+            <Icon className={children ? 'ml-2 w-4 h-4' : 'w-4 h-4'} />
           )}
-        </>
+        </div>
       )}
     </button>
   );

@@ -2,26 +2,48 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
+const fs = require('fs');
 const uploadRoutes = require('./routes/uploadRoutes');
+const errorHandler = require('./middleware/errorMiddleware');
+const config = require('./config/index');
 
 // Create Express app
 const app = express();
+
+// Ensure upload directories exist
+const uploadsDir = path.resolve(config.storage.localPath);
+const tempDir = path.resolve(config.storage.tempPath);
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('📁 Created uploads directory:', uploadsDir);
+}
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+  console.log('📁 Created temp directory:', tempDir);
+}
+
+// Export config for use in other modules
+app.locals.config = config;
 
 // Security middleware
 app.use(helmet());
 
 // CORS configuration
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
-}));
+app.use(cors(config.cors));
 
 // Logging middleware
 app.use(morgan('combined'));
 
-// Body parsing middleware
-app.use(express.json({ limit: '100mb' })); // Large limit for video uploads
-app.use(express.urlencoded({ extended: true }));
+// Body parsing middleware with size limits
+app.use(express.json({
+  limit: config.upload.requestSize,
+}));
+app.use(express.urlencoded({ 
+  extended: true, 
+  limit: config.upload.requestSize 
+}));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -30,7 +52,8 @@ app.get('/health', (req, res) => {
     message: 'Upload Service is running',
     timestamp: new Date().toISOString(),
     service: 'upload-service',
-    version: '1.0.0'
+    version: '1.0.0',
+    config: config.validation.getUploadLimits()
   });
 });
 
@@ -41,8 +64,10 @@ app.get('/', (req, res) => {
     message: 'Welcome to ClipSync Upload Service',
     endpoints: {
       health: '/health',
-      upload: 'POST /api/upload',
-      status: 'GET /api/upload/status/:id'
+      initUpload: 'POST /api/upload/init',
+      uploadChunk: 'POST /api/upload/chunk',
+      completeUpload: 'POST /api/upload/complete',
+      uploadStatus: 'GET /api/upload/status/:uploadId'
     }
   });
 });
@@ -59,15 +84,6 @@ app.use('*', (req, res) => {
   });
 });
 
-// Global error handler
-app.use((error, req, res, next) => {
-  console.error('Global error handler:', error);
-  
-  res.status(error.status || 500).json({
-    success: false,
-    message: error.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
-  });
-});
+app.use(errorHandler)
 
 module.exports = app;

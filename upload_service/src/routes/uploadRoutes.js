@@ -1,9 +1,14 @@
 const express = require('express');
+const uploadController = require('../controllers/uploadController');
 
 const router = express.Router();
 
+
+// upload initialization endpoint
+router.post('/init', uploadController.uploadInitialization);
+
 // Upload endpoint placeholder
-router.post('/', (req, res) => {
+router.post('/video', (req, res) => {
   console.log('Upload request received');
   res.json({
     success: true,

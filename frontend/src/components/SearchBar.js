@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/components/SearchBar.css';
 
 const SearchBar = ({ searchTerm, onSearch, placeholder = "Search videos..." }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -100,51 +99,61 @@ const SearchBar = ({ searchTerm, onSearch, placeholder = "Search videos..." }) =
   };
 
   return (
-    <div className="search-bar-container">
-      <div className="search-bar">
-        <input
-          type="text"
-          className="search-input"
-          placeholder={placeholder}
-          value={searchTerm}
-          onChange={handleInputChange}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
-        />
-        
-        {searchTerm && (
-          <button
-            className="search-clear"
-            onClick={clearSearch}
-            aria-label="Clear search"
-          >
-            ❌
-          </button>
-        )}
+    <div className="relative w-full max-w-2xl">
+      <div className="relative flex items-center">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            className="form-input pl-12 pr-10 bg-white/80 backdrop-blur-sm border-gray-200 focus:border-primary-400 focus:ring-primary-400"
+            placeholder={placeholder}
+            value={searchTerm}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
+          />
+          
+          {/* Search Icon */}
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          
+          {/* Clear Button */}
+          {searchTerm && (
+            <button
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              onClick={clearSearch}
+              aria-label="Clear search"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
-      
-      <button className="search-button" aria-label="Search">
-        <div className="search-icon">🔍</div>
-      </button>
 
       {/* Search Suggestions */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="search-suggestions">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
           {loading && (
-            <div className="search-suggestion-item">
-              <div className="suggestion-icon">⏳</div>
+            <div className="flex items-center px-4 py-3 text-gray-500">
+              <div className="spinner mr-3"></div>
               <span>Loading suggestions...</span>
             </div>
           )}
           {!loading && suggestions.map((suggestion, index) => (
-            <div
+            <button
               key={index}
-              className="search-suggestion-item"
+              className="flex items-center w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-200 first:rounded-t-xl last:rounded-b-xl"
               onClick={() => handleSuggestionClick(suggestion)}
             >
-              <div className="suggestion-icon">🔍</div>
-              <span>{suggestion}</span>
-            </div>
+              <svg className="w-4 h-4 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span className="text-gray-700">{suggestion}</span>
+            </button>
           ))}
         </div>
       )}
