@@ -1,0 +1,17 @@
+{
+  "uploadId": "dinesh_a69c49358ed7c2e4ed56f78c9c0fd858",
+  "fileName": "dinesh.mp4",
+  "originalFileName": "dinesh.mp4",
+  "totalChunks": 20,
+  "fileSize": 100234222,
+  "chunksReceived": 0,
+  "status": "initialized",
+  "videoMetadata": {
+    "title": "dinesh.mp4",
+    "description": "",
+    "category": "General"
+  },
+  "createdAt": "2025-08-24T18:13:14.261Z",
+  "updatedAt": "2025-08-24T18:13:14.261Z",
+  "chunks": []
+}

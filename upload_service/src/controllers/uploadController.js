@@ -1,4 +1,5 @@
-const config = require("../config/index");
+
+const config = require('../config/index');
 const ValidationConfig = require('../config/validation');
 const fs = require('fs');
 const path = require('path');
@@ -42,7 +43,7 @@ const uploadInitialization = (req, res) => {
     }
 
     // Generate upload ID and create directory
-    const uploadId = ValidationConfig.generateUploadId();
+    const uploadId = ValidationConfig.generateUploadId(fileName);
     const uploadDir = path.join(config.storage.localPath, uploadId);
     
     try {

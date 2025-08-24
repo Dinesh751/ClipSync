@@ -52,8 +52,7 @@ app.get('/health', (req, res) => {
     message: 'Upload Service is running',
     timestamp: new Date().toISOString(),
     service: 'upload-service',
-    version: '1.0.0',
-    config: config.validation.getUploadLimits()
+    version: '1.0.0'
   });
 });
 
