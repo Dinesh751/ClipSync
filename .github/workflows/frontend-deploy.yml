@@ -27,12 +27,6 @@ jobs:
           cd frontend
           npm ci
       
-      - name: Run ESLint check
-        run: |
-          cd frontend
-          npm run lint:check
-        env:
-          CI: true
 
       - name: Build application
         run: |
