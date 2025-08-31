@@ -1,6 +1,7 @@
 // Utility functions for form validation
 
 export const validateEmail = (email) => {
+
   if (!email) return 'Email is required';
   
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,6 +31,15 @@ export const validatePassword = (password) => {
   }
   
   return null;
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+export const validatePassword = (password) => {
+  // At least 8 characters, contains at least one letter and one number
+  return password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password);
+
 };
 
 export const validateRequired = (value) => {
@@ -48,6 +58,7 @@ export const validateVideoFile = (file) => {
   return allowedTypes.includes(file.type);
 };
 
+
 // Individual field validation function
 export const validateField = (fieldName, value, formData = {}) => {
   switch (fieldName) {
@@ -59,10 +70,38 @@ export const validateField = (fieldName, value, formData = {}) => {
     
     case 'confirmPassword':
       if (!value) return 'Please confirm your password';
+
+// Validate individual fields
+export const validateField = (fieldName, value, formData = {}) => {
+  switch (fieldName) {
+    case 'email':
+      if (!validateRequired(value)) {
+        return 'Email is required';
+      }
+      if (!validateEmail(value)) {
+        return 'Please enter a valid email address';
+      }
+      return null;
+
+    case 'password':
+      if (!validateRequired(value)) {
+        return 'Password is required';
+      }
+      if (!validatePassword(value)) {
+        return 'Password must be at least 8 characters with letters and numbers';
+      }
+      return null;
+
+    case 'confirmPassword':
+      if (!validateRequired(value)) {
+        return 'Please confirm your password';
+      }
+
       if (value !== formData.password) {
         return 'Passwords do not match';
       }
       return null;
+
     
     case 'firstName':
       if (!validateRequired(value)) return 'First name is required';
@@ -84,6 +123,39 @@ export const validateField = (fieldName, value, formData = {}) => {
 };
 
 // Login form validation
+
+
+    case 'firstName':
+      if (!validateRequired(value)) {
+        return 'First name is required';
+      }
+      if (value.trim().length < 2) {
+        return 'First name must be at least 2 characters';
+      }
+      return null;
+
+    case 'lastName':
+      if (!validateRequired(value)) {
+        return 'Last name is required';
+      }
+      if (value.trim().length < 2) {
+        return 'Last name must be at least 2 characters';
+      }
+      return null;
+
+    case 'agreeToTerms':
+      if (!value) {
+        return 'You must agree to the terms and conditions';
+      }
+      return null;
+
+    default:
+      return null;
+  }
+};
+
+// Validate login form
+
 export const validateLoginForm = (formData) => {
   const errors = {};
   
@@ -91,10 +163,16 @@ export const validateLoginForm = (formData) => {
   const emailError = validateField('email', formData.email, formData);
   if (emailError) errors.email = emailError;
   
+
   // Validate password (just check if it exists for login)
   if (!validateRequired(formData.password)) {
     errors.password = 'Password is required';
   }
+
+  // Validate password
+  const passwordError = validateField('password', formData.password, formData);
+  if (passwordError) errors.password = passwordError;
+
   
   return {
     errors,
@@ -102,7 +180,8 @@ export const validateLoginForm = (formData) => {
   };
 };
 
-// Signup form validation
+
+
 export const validateSignupForm = (formData) => {
   const errors = {};
   
@@ -139,7 +218,11 @@ export const validateSignupForm = (formData) => {
 // Get password strength
 export const getPasswordStrength = (password) => {
   if (!password) {
+
     return { strength: 0, text: 'No password', color: 'gray' };
+
+    return { strength: 0, text: '', color: 'gray' };
+
   }
   
   let score = 0;

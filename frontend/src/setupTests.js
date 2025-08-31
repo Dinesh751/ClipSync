@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 
+
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
@@ -152,3 +153,15 @@ beforeEach(() => {
 
 // Global test timeout
 jest.setTimeout(10000);
+
+// Mock react-hot-toast to avoid errors in tests
+jest.mock('react-hot-toast', () => ({
+  toast: {
+    success: jest.fn(),
+    error: jest.fn(),
+    loading: jest.fn(),
+    dismiss: jest.fn(),
+  },
+  Toaster: () => null,
+}));
+
