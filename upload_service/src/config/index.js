@@ -6,11 +6,10 @@ module.exports = {
         chunkSize: 1024 * 1024 // 1MB chunks
     },
     storage: {
-        localPath: require('path').join(__dirname, '../../uploads'),
-        tempPath: require('path').join(__dirname, '../../temp')
+        localPath: require('path').join(__dirname, '../../uploads')
     },
     server: {
-        port: process.env.PORT || 3002,
+        port: process.env.PORT || 6002,
         cors: {
             origin: process.env.FRONTEND_URL || 'http://localhost:3000'
         }

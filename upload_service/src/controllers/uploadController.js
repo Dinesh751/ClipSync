@@ -110,6 +110,78 @@ const uploadInitialization = (req, res) => {
     }
 }
 
+const uploadVideo = (req, res) => {
+    try {
+    const { file } = req;
+    const {  uploadId, title, description, tags, category } = req.body;
+
+    if (!file || !uploadId ) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing required fields: file, uploadId, fileName'
+        });
+    }
+
+    console.log('Received file:', {
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        size: file.size,
+        uploadId,
+        title,
+        description,
+        tags,
+        category
+    });
+
+    const uploadDir = path.join(config.storage.localPath, uploadId);
+
+    if(!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, {recursive: true});
+    }
+
+    const sanitizedFileName = ValidationConfig.sanitizeFilename(file.originalname);
+    const filePath = path.join(uploadDir, sanitizedFileName);
+    
+    fs.writeFileSync(filePath, file.buffer);
+
+    console.log(`✅ File saved successfully to: ${filePath}`);
+
+     
+
+        // Update metadata to track the saved file
+        const metadataPath = path.join(uploadDir, 'metadata.json');
+        if (fs.existsSync(metadataPath)) {
+            const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+            metadata.status = 'uploaded';
+            metadata.filePath = filePath;
+            metadata.uploadedAt = new Date().toISOString();
+            metadata.actualFileSize = file.size;
+            
+            fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+        }
+
+        res.json({
+            success: true,
+            message: 'File uploaded and saved successfully',
+            data: {
+                uploadId,
+                fileName: sanitizedFileName,
+                filePath,
+                size: file.size,
+                status: 'uploaded'
+            }
+        });
+
+    } catch (error) {
+        console.error('Error saving file:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to save file',
+            error: error.message
+        });
+    }
+};
+
 // Function to handle upload completion/cancellation
 const releaseUploadSlot = (uploadId, reason = 'completed') => {
     if (activeUploads > 0) {
@@ -120,5 +192,6 @@ const releaseUploadSlot = (uploadId, reason = 'completed') => {
 
 module.exports = {
     uploadInitialization,
-    releaseUploadSlot
+    releaseUploadSlot,
+    uploadVideo
 };

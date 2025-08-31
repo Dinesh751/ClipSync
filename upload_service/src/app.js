@@ -13,16 +13,12 @@ const app = express();
 
 // Ensure upload directories exist
 const uploadsDir = path.resolve(config.storage.localPath);
-const tempDir = path.resolve(config.storage.tempPath);
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
   console.log('📁 Created uploads directory:', uploadsDir);
 }
-if (!fs.existsSync(tempDir)) {
-  fs.mkdirSync(tempDir, { recursive: true });
-  console.log('📁 Created temp directory:', tempDir);
-}
+
 
 // Export config for use in other modules
 app.locals.config = config;

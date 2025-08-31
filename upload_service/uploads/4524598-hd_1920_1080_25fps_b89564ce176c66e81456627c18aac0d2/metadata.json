@@ -1,0 +1,20 @@
+{
+  "uploadId": "4524598-hd_1920_1080_25fps_b89564ce176c66e81456627c18aac0d2",
+  "fileName": "4524598-hd_1920_1080_25fps.mp4",
+  "originalFileName": "4524598-hd_1920_1080_25fps.mp4",
+  "totalChunks": 5,
+  "fileSize": 22188322,
+  "chunksReceived": 0,
+  "status": "uploaded",
+  "videoMetadata": {
+    "title": "Wind",
+    "description": "Wind ",
+    "category": "music"
+  },
+  "createdAt": "2025-08-31T16:55:58.280Z",
+  "updatedAt": "2025-08-31T16:55:58.280Z",
+  "chunks": [],
+  "filePath": "/Users/dineshbudime/Documents/MyProjects/React + Node/ClipSync/upload_service/uploads/4524598-hd_1920_1080_25fps_b89564ce176c66e81456627c18aac0d2/4524598-hd_1920_1080_25fps.mp4",
+  "uploadedAt": "2025-08-31T16:55:58.340Z",
+  "actualFileSize": 22188322
+}
