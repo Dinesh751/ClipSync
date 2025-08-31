@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const Upload = () => {
   const navigate = useNavigate();
@@ -21,33 +22,68 @@ const Upload = () => {
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('video/')) {
-        toast.error('Please select a valid video file');
-        return;
-      }
-      
-      // Validate file size (100MB limit)
-      if (file.size > 100 * 1024 * 1024) {
-        toast.error('File size must be less than 100MB');
-        return;
-      }
-      
-      setUploadState(prev => ({ ...prev, file }));
-      toast.success('Video file selected successfully');
+    console.log('File selected:', file); // Debug log
+    
+    if (!file) {
+      console.log('No file selected');
+      return;
     }
+
+    // Validate file type
+    if (!file.type.startsWith('video/')) {
+      toast.error('Please select a valid video file');
+      e.target.value = ''; // Clear the input
+      return;
+    }
+
+    // Validate file size (5GB limit)
+    if (file.size > 5 * 1024 * 1024 * 1024) {
+      toast.error('File size must be less than or equal to 5GB');
+      e.target.value = ''; // Clear the input
+      return;
+    }
+    
+    // Update state with callback to ensure it's set
+    setUploadState(prev => {
+      const newState = { ...prev, file };
+      console.log('State updated with file:', newState.file?.name); // Debug log
+      return newState;
+    });
+    
+    toast.success(`Video file selected: ${file.name}`);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('video/')) {
-      setUploadState(prev => ({ ...prev, file }));
-      toast.success('Video file dropped successfully');
-    } else {
-      toast.error('Please drop a valid video file');
+    console.log('File dropped:', file); // Debug log
+    
+    if (!file) {
+      toast.error('No file detected');
+      return;
     }
+
+    if (!file.type.startsWith('video/')) {
+      toast.error('Please drop a valid video file');
+      return;
+    }
+
+    // Validate file size for dropped files too
+    if (file.size > 5 * 1024 * 1024 * 1024) {
+      toast.error('File size must be less than or equal to 5GB');
+      return;
+    }
+    
+    // Update state with callback to ensure it's set
+    setUploadState(prev => {
+      const newState = { ...prev, file };
+      console.log('State updated with dropped file:', newState.file?.name); // Debug log
+      return newState;
+    });
+    
+    toast.success(`Video file dropped: ${file.name}`);
   };
 
   const handleDragOver = (e) => {
@@ -64,30 +100,53 @@ const Upload = () => {
     
     try {
       // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadState(prev => {
-          if (prev.progress >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return { ...prev, progress: prev.progress + 10 };
-        });
-      }, 500);
+//  const { fileName, totalChunks, fileSize, title, description, category } = req.body;
+      const totalChunks = Math.ceil(uploadState.file.size / (5 * 1024 * 1024)); // 5MB chunks
+      const initResponse = await axios.post('http://localhost:5002/api/upload/init', {
+        fileName: uploadState.file.name,
+        fileSize: uploadState.file.size,
+        title: uploadState.title,
+        totalChunks,
+        description: uploadState.description,
+        category: uploadState.category,
+        tags: uploadState.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+      }).catch(err => {
+        console.error('Upload initialization failed:', err);
+        const errorMessage = err.response?.data?.message || 'Failed to initialize upload';
+        toast.error(errorMessage);
+        setUploadState(prev => ({ ...prev, uploading: false, progress: 0 }));
+        return null; // Return null to indicate failure
+      });
 
-      // Simulate API call
-      setTimeout(() => {
-        clearInterval(progressInterval);
-        setUploadState(prev => ({ ...prev, progress: 100 }));
-        
-        setTimeout(() => {
-          toast.success('Video uploaded successfully!');
-          navigate('/');
-        }, 1000);
-      }, 5000);
+      const uploadId = initResponse.data.data.uploadId; // Fixed: Access nested data
+
+      console.log('Upload initialized with ID:', uploadId);
+
+      const formData = new FormData();
+      formData.append('file', uploadState.file);
+      formData.append('uploadId', uploadId);
+      //formData.append('chunkIndex', 0); // For simplicity, sending as single chunk
+      //formData.append('totalChunks', totalChunks);    
+      formData.append('title', uploadState.title);
+      formData.append('description', uploadState.description);
+      formData.append('category', uploadState.category);
+      formData.append('tags', uploadState.tags);
+      
+      const uploadResponse = await axios.post('http://localhost:5002/api/upload/video', formData, {
+        headers :{
+          contentType: "multipart/formData" 
+        }
+      });
+
+      console.log(uploadResponse.data);
+
+
+
+
       
     } catch (error) {
-      console.error('Upload failed:', error);
-      toast.error('Upload failed. Please try again.');
+      console.error('Unexpected upload error:', error);
+      toast.error(error.message || 'An unexpected error occurred during upload');
       setUploadState(prev => ({ ...prev, uploading: false, progress: 0 }));
     }
   };
@@ -124,14 +183,25 @@ const Upload = () => {
           <div className="space-y-6">
             {/* File Upload Area */}
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Select Video File</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Select Video File
+                {/* Debug indicator */}
+                {uploadState.file && (
+                  <span className="ml-2 text-sm text-green-600">(File: {uploadState.file.name})</span>
+                )}
+              </h2>
               
               {!uploadState.file ? (
                 <div
                   className="border-2 border-dashed border-blue-300 rounded-2xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-300"
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
-                  onClick={() => fileInputRef.current?.click()}
+                  onDragEnter={(e) => e.preventDefault()}
+                  onDragLeave={(e) => e.preventDefault()}
+                  onClick={() => {
+                    console.log('Upload area clicked');
+                    fileInputRef.current?.click();
+                  }}
                 >
                   <div className="space-y-4">
                     <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
@@ -145,12 +215,12 @@ const Upload = () => {
                     </div>
                     <div className="text-xs text-gray-400">
                       <p>Supported formats: MP4, MOV, AVI, WMV</p>
-                      <p>Maximum size: 100MB</p>
+                      <p>Maximum size: 5GB</p>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 border-2 border-green-200">
+                <div key={uploadState.file.name} className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 border-2 border-green-200">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                       <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,10 +232,30 @@ const Upload = () => {
                       <p className="text-sm text-gray-500">
                         {(uploadState.file.size / (1024 * 1024)).toFixed(2)} MB
                       </p>
+                      <p className="text-xs text-gray-400">
+                        Type: {uploadState.file.type}
+                      </p>
                     </div>
                     <button
-                      onClick={() => setUploadState(prev => ({ ...prev, file: null }))}
-                      className="text-red-500 hover:text-red-700 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Removing file');
+                        setUploadState(prev => ({ ...prev, file: null }));
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = '';
+                        }
+                        toast('File removed', {
+                          icon: 'ℹ️',
+                          duration: 2000,
+                          style: {
+                            borderRadius: '10px',
+                            background: '#f3f4f6',
+                            color: '#374151',
+                          },
+                        });
+                      }}
+                      className="text-red-500 hover:text-red-700 transition-colors p-2 hover:bg-red-50 rounded-lg"
+                      title="Remove file"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -180,6 +270,10 @@ const Upload = () => {
                 type="file"
                 accept="video/*"
                 onChange={handleFileSelect}
+                onClick={(e) => {
+                  // Clear the input value to allow selecting the same file again
+                  e.target.value = '';
+                }}
                 className="hidden"
               />
             </div>

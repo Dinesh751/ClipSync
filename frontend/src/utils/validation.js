@@ -1,6 +1,37 @@
 // Utility functions for form validation
 
 export const validateEmail = (email) => {
+
+  if (!email) return 'Email is required';
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return 'Please enter a valid email address';
+  }
+  return null;
+};
+
+export const validatePassword = (password) => {
+  if (!password) return 'Password is required';
+  
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters long';
+  }
+  
+  if (!/(?=.*[a-z])/.test(password)) {
+    return 'Password must contain at least one lowercase letter';
+  }
+  
+  if (!/(?=.*[A-Z])/.test(password)) {
+    return 'Password must contain at least one uppercase letter';
+  }
+  
+  if (!/(?=.*\d)/.test(password)) {
+    return 'Password must contain at least one number';
+  }
+  
+  return null;
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
@@ -8,6 +39,7 @@ export const validateEmail = (email) => {
 export const validatePassword = (password) => {
   // At least 8 characters, contains at least one letter and one number
   return password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password);
+
 };
 
 export const validateRequired = (value) => {
@@ -25,6 +57,19 @@ export const validateVideoFile = (file) => {
   const allowedTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm'];
   return allowedTypes.includes(file.type);
 };
+
+
+// Individual field validation function
+export const validateField = (fieldName, value, formData = {}) => {
+  switch (fieldName) {
+    case 'email':
+      return validateEmail(value);
+    
+    case 'password':
+      return validatePassword(value);
+    
+    case 'confirmPassword':
+      if (!value) return 'Please confirm your password';
 
 // Validate individual fields
 export const validateField = (fieldName, value, formData = {}) => {
@@ -51,10 +96,34 @@ export const validateField = (fieldName, value, formData = {}) => {
       if (!validateRequired(value)) {
         return 'Please confirm your password';
       }
+
       if (value !== formData.password) {
         return 'Passwords do not match';
       }
       return null;
+
+    
+    case 'firstName':
+      if (!validateRequired(value)) return 'First name is required';
+      if (value.trim().length < 2) return 'First name must be at least 2 characters';
+      return null;
+      
+    case 'lastName':
+      if (!validateRequired(value)) return 'Last name is required';
+      if (value.trim().length < 2) return 'Last name must be at least 2 characters';
+      return null;
+    
+    case 'agreeToTerms':
+      if (!value) return 'You must agree to the terms and conditions';
+      return null;
+    
+    default:
+      return validateRequired(value) ? null : `${fieldName} is required`;
+  }
+};
+
+// Login form validation
+
 
     case 'firstName':
       if (!validateRequired(value)) {
@@ -86,6 +155,7 @@ export const validateField = (fieldName, value, formData = {}) => {
 };
 
 // Validate login form
+
 export const validateLoginForm = (formData) => {
   const errors = {};
   
@@ -93,9 +163,16 @@ export const validateLoginForm = (formData) => {
   const emailError = validateField('email', formData.email, formData);
   if (emailError) errors.email = emailError;
   
+
+  // Validate password (just check if it exists for login)
+  if (!validateRequired(formData.password)) {
+    errors.password = 'Password is required';
+  }
+
   // Validate password
   const passwordError = validateField('password', formData.password, formData);
   if (passwordError) errors.password = passwordError;
+
   
   return {
     errors,
@@ -103,7 +180,8 @@ export const validateLoginForm = (formData) => {
   };
 };
 
-// Validate signup form
+
+
 export const validateSignupForm = (formData) => {
   const errors = {};
   
@@ -140,7 +218,11 @@ export const validateSignupForm = (formData) => {
 // Get password strength
 export const getPasswordStrength = (password) => {
   if (!password) {
+
+    return { strength: 0, text: 'No password', color: 'gray' };
+
     return { strength: 0, text: '', color: 'gray' };
+
   }
   
   let score = 0;
