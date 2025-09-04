@@ -27,9 +27,11 @@ jobs:
           cd frontend
           npm ci
 
+
       - name: Build application
         run: |
           cd frontend
           npm run build
         env:
           CI: true
+
