@@ -19,7 +19,7 @@ const VideoPlayer = () => {
         
         // Mock video data
         const mockVideo = {
-          id: id,
+          id: 123,
           title: "Sample Video Title",
           description: "This is a sample video description. In a real application, this would be fetched from your backend API.",
           views: "1.2K",

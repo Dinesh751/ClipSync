@@ -31,15 +31,6 @@ export const validatePassword = (password) => {
   }
   
   return null;
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-export const validatePassword = (password) => {
-  // At least 8 characters, contains at least one letter and one number
-  return password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password);
-
 };
 
 export const validateRequired = (value) => {
@@ -60,18 +51,6 @@ export const validateVideoFile = (file) => {
 
 
 // Individual field validation function
-export const validateField = (fieldName, value, formData = {}) => {
-  switch (fieldName) {
-    case 'email':
-      return validateEmail(value);
-    
-    case 'password':
-      return validatePassword(value);
-    
-    case 'confirmPassword':
-      if (!value) return 'Please confirm your password';
-
-// Validate individual fields
 export const validateField = (fieldName, value, formData = {}) => {
   switch (fieldName) {
     case 'email':
@@ -124,35 +103,6 @@ export const validateField = (fieldName, value, formData = {}) => {
 
 // Login form validation
 
-
-    case 'firstName':
-      if (!validateRequired(value)) {
-        return 'First name is required';
-      }
-      if (value.trim().length < 2) {
-        return 'First name must be at least 2 characters';
-      }
-      return null;
-
-    case 'lastName':
-      if (!validateRequired(value)) {
-        return 'Last name is required';
-      }
-      if (value.trim().length < 2) {
-        return 'Last name must be at least 2 characters';
-      }
-      return null;
-
-    case 'agreeToTerms':
-      if (!value) {
-        return 'You must agree to the terms and conditions';
-      }
-      return null;
-
-    default:
-      return null;
-  }
-};
 
 // Validate login form
 
