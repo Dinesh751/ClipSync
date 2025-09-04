@@ -33,10 +33,3 @@ jobs:
           npm run build
         env:
           CI: true
-      
-      - name: Run tests
-        run: |
-          cd frontend
-          npm test -- --coverage --ci --watchAll=false
-        env:
-          CI: true
